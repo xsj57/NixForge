@@ -22,8 +22,7 @@
 5. [安装 yazi](#安装yazi)
 6. [中文输入法](#中文输入法fcitx5)
 7. [GNOME 增强](#gnome-增强)
-8. [修改默认字体](#设置-jetbrains-mono-为系统默认字体)
-9. [相关项目](#相关项目)
+8. [相关项目](#相关项目)
 
 ### 开启 SSH
 
@@ -206,13 +205,16 @@ rm -rf ~/.config/nvim/.git
 ```
 { config, pkgs, ... }:
 {
-  i18n.inputMethod.enabled = "fcitx5";
-  i18n.inputMethod.fcitx5.addons = with pkgs; [
-    fcitx5-chinese-addons
-    fcitx5-gtk
-    fcitx5-qt
-    fcitx5-configtool
-  ];
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      fcitx5-chinese-addons
+      fcitx5-gtk
+      libsForQt5.fcitx5-qt
+      fcitx5-configtool
+    ];
+  };
 }
 ```
 
@@ -229,33 +231,6 @@ rm -rf ~/.config/nvim/.git
   services.gnome.gnome-keyring.enable = true;
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
-}
-```
-
-### 设置 JetBrains Mono 为系统默认字体
-
-在`configuration.nix`中增加以下部分:
-
-```
-{ config, pkgs, ... }:
-{
-  fonts.packages = with pkgs; [
-    jetbrains-mono
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  ];
-  fonts.fontconfig.defaultFonts.monospace = [
-    "JetBrainsMono Nerd Font Mono"
-    "JetBrainsMono Nerd Font"
-    "JetBrains Mono"
-  ];
-
-  # Also set GNOME monospace/UI fonts (remove UI if undesired)
-  programs.dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      monospace-font-name = "JetBrainsMono Nerd Font 12";
-      font-name = "JetBrainsMono Nerd Font 11";
-    };
-  };
 }
 ```
 

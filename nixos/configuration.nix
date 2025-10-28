@@ -42,14 +42,17 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Chinese input method (fcitx5)
-  i18n.inputMethod.enabled = "fcitx5";
-  i18n.inputMethod.fcitx5.addons = with pkgs; [
-    fcitx5-chinese-addons
-    fcitx5-gtk
-    fcitx5-qt
-    fcitx5-configtool
-  ];
+  # Chinese input method (fcitx5) - new schema
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      fcitx5-chinese-addons
+      fcitx5-gtk
+      libsForQt5.fcitx5-qt
+      fcitx5-configtool
+    ];
+  };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -132,33 +135,13 @@
     yazi
     starship
     #ffmpeg  # Video/Audio Preview
-    pkgs."7zip"   # modern 7-Zip CLI (7zz)
+    p7zip   # modern 7-Zip CLI (7zz)
     jq      # JSON processing
     #poppler_utils  # PDF Preview
     zoxide  # Table of Contents Jump (optional, but recommended)
     resvg   # SVG rendering (optional)
     #imagemagick  # Image Processing (recommended)
   ];
-
-  # Fonts: install JetBrains Mono and Nerd Fonts variant, set default monospace
-  fonts.packages = with pkgs; [
-    jetbrains-mono
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  ];
-  # Prefer Nerd Font Mono, then Nerd Font, then upstream JetBrains Mono
-  fonts.fontconfig.defaultFonts.monospace = [
-    "JetBrainsMono Nerd Font Mono"
-    "JetBrainsMono Nerd Font"
-    "JetBrains Mono"
-  ];
-
-  # Set GNOME interface fonts via dconf (monospace + UI font)
-  programs.dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      monospace-font-name = "JetBrainsMono Nerd Font Mono 12";
-      font-name = "JetBrainsMono Nerd Font 11"; # Optional: use Nerd Font for UI font
-    };
-  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -206,9 +189,13 @@
     # Match the mount unit name derived from the mount path: /home/ericxu/Downloads/Share -> home-ericxu-Downloads-Share.mount
     after = [ "home-ericxu-Downloads-Share.mount" ];  # After mounting, run
     wantedBy = [ "multi-user.target" ];
+    unitConfig = {
+      ConditionPathIsMountPoint = "/home/ericxu/Downloads/Share";
+    };
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.bash}/bin/bash -c 'chown -R 1000:100 /home/ericxu/Downloads/Share && chmod -R 777 /home/ericxu/Downloads/Share'";  # Replace with your UID/GID
+      # Best-effort: ignore permission errors on 9p/virtiofs files (e.g., host-owned .git objects)
+      ExecStart = "${pkgs.bash}/bin/bash -c 'chown -Rh 1000:100 /home/ericxu/Downloads/Share 2>/dev/null || true; chmod -R 777 /home/ericxu/Downloads/Share 2>/dev/null || true'";  # Replace with your UID/GID
     };
   };
 

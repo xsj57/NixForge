@@ -24,8 +24,7 @@
 5. [Install yazi](#install-yazi)
 6. [Chinese Input Method](#chinese-input-method-fcitx5)
 7. [GNOME Enhancements](#gnome-enhancements)
-8. [Modify default font](#set-jetbrains-mono-as-default-font)
-9. [Related Items](#related-projects)
+8. [Related Items](#related-projects)
 
 ### enable SSH
 
@@ -208,13 +207,16 @@ Enable fcitx5 with Chinese addons (Wayland/GTK/Qt supported):
 ```
 { config, pkgs, ... }:
 {
-  i18n.inputMethod.enabled = "fcitx5";
-  i18n.inputMethod.fcitx5.addons = with pkgs; [
-    fcitx5-chinese-addons
-    fcitx5-gtk
-    fcitx5-qt
-    fcitx5-configtool
-  ];
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      fcitx5-chinese-addons
+      fcitx5-gtk
+      libsForQt5.fcitx5-qt
+      fcitx5-configtool
+    ];
+  };
 }
 ```
 
@@ -231,33 +233,6 @@ Recommended additions for GNOME desktop:
   services.gnome.gnome-keyring.enable = true;
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
-}
-```
-
-### Set JetBrains Mono as default font
-
-Add the following section in `configuration.nix`:
-
-```
-{ config, pkgs, ... }:
-{
-  fonts.packages = with pkgs; [
-    jetbrains-mono
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  ];
-  fonts.fontconfig.defaultFonts.monospace = [
-    "JetBrainsMono Nerd Font Mono"
-    "JetBrainsMono Nerd Font"
-    "JetBrains Mono"
-  ];
-
-  # Also set GNOME monospace/UI fonts (remove UI if undesired)
-  programs.dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      monospace-font-name = "JetBrainsMono Nerd Font 12";
-      font-name = "JetBrainsMono Nerd Font 11";
-    };
-  };
 }
 ```
 
