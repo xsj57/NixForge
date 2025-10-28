@@ -208,17 +208,29 @@ rm -rf ~/.config/nvim/.git
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-chinese-addons
-      fcitx5-gtk
-      libsForQt5.fcitx5-qt
-      fcitx5-configtool
-    ];
+    fcitx5 = {
+      waylandFrontend = true; # Better under GNOME Wayland
+      addons = with pkgs; [
+        fcitx5-chinese-addons
+        fcitx5-gtk
+        libsForQt5.fcitx5-qt
+        qt6Packages.fcitx5-qt
+        fcitx5-configtool
+      ];
+    };
+  };
+
+  # Environment variables (usually auto-set by the module; keep for robustness)
+  environment.variables = {
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
   };
 }
 ```
 
 说明：使用 NixOS 模块启用后，会自动设置输入法相关环境变量（GTK/QT/XMODIFIERS），登录 GNOME 后即可使用。
+可能需要安装[gnome-shell-extension-kimpanel](https://github.com/wengxt/gnome-shell-extension-kimpanel)来增加菜单栏图标
 
 ### GNOME 增强
 

@@ -210,17 +210,29 @@ Enable fcitx5 with Chinese addons (Wayland/GTK/Qt supported):
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-chinese-addons
-      fcitx5-gtk
-      libsForQt5.fcitx5-qt
-      fcitx5-configtool
-    ];
+    fcitx5 = {
+      waylandFrontend = true; # Better under GNOME Wayland
+      addons = with pkgs; [
+        fcitx5-chinese-addons
+        fcitx5-gtk
+        libsForQt5.fcitx5-qt
+        qt6Packages.fcitx5-qt
+        fcitx5-configtool
+      ];
+    };
+  };
+
+  # Environment variables (usually auto-set by the module; keep for robustness)
+  environment.variables = {
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
   };
 }
 ```
 
 Note: the NixOS module sets the necessary environment variables automatically; after logging into GNOME the input method should work.
+It may be necessary to install [gnome-shell-extension-kimpanel](https://github.com/wengxt/gnome-shell-extension-kimpanel) to add menu bar icons
 
 ### GNOME enhancements
 

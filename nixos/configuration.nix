@@ -46,12 +46,23 @@
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-chinese-addons
-      fcitx5-gtk
-      libsForQt5.fcitx5-qt
-      fcitx5-configtool
-    ];
+    fcitx5 = {
+      waylandFrontend = true; # Better under GNOME Wayland
+      addons = with pkgs; [
+        fcitx5-chinese-addons
+        fcitx5-gtk
+        libsForQt5.fcitx5-qt
+        qt6Packages.fcitx5-qt
+        fcitx5-configtool
+      ];
+    };
+  };
+
+  # Environment variables (usually auto-set by the module; keep for robustness)
+  environment.variables = {
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
   };
 
   # Enable the X11 windowing system.
