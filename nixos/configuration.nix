@@ -42,12 +42,27 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  # Chinese input method (fcitx5)
+  i18n.inputMethod.enabled = "fcitx5";
+  i18n.inputMethod.fcitx5.addons = with pkgs; [
+    fcitx5-chinese-addons
+    fcitx5-gtk
+    fcitx5-qt
+    fcitx5-configtool
+  ];
+
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+
+  # GNOME enhancements
+  programs.dconf.enable = true;
+  services.gnome.gnome-keyring.enable = true;
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -99,8 +114,7 @@
   environment.systemPackages = with pkgs; [ 
     #qemu-guest-agent
     spice-vdagent  # Visitor Tools
-    pkgs._9pfs
-    pkgs.virtiofsd
+    virtiofsd
     fish
     ghostty
     git
@@ -118,13 +132,33 @@
     yazi
     starship
     #ffmpeg  # Video/Audio Preview
-    _7zz    # Basic 7z support (use this as a replacement if _7zz-rar does not work)
+    pkgs."7zip"   # modern 7-Zip CLI (7zz)
     jq      # JSON processing
     #poppler_utils  # PDF Preview
     zoxide  # Table of Contents Jump (optional, but recommended)
     resvg   # SVG rendering (optional)
     #imagemagick  # Image Processing (recommended)
   ];
+
+  # Fonts: install JetBrains Mono and Nerd Fonts variant, set default monospace
+  fonts.packages = with pkgs; [
+    jetbrains-mono
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+  ];
+  # Prefer Nerd Font Mono, then Nerd Font, then upstream JetBrains Mono
+  fonts.fontconfig.defaultFonts.monospace = [
+    "JetBrainsMono Nerd Font Mono"
+    "JetBrainsMono Nerd Font"
+    "JetBrains Mono"
+  ];
+
+  # Set GNOME interface fonts via dconf (monospace + UI font)
+  programs.dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      monospace-font-name = "JetBrainsMono Nerd Font Mono 12";
+      font-name = "JetBrainsMono Nerd Font 11"; # Optional: use Nerd Font for UI font
+    };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -169,7 +203,8 @@
    # Add systemd service: Recursively adjust permissions after mounting
   systemd.services.fix-share-permissions = {
   description = "Fix permissions on /home/ericxu/Downloads/Share recursively";
-    after = [ "mnt-share.mount" ];  # After mounting, run
+    # Match the mount unit name derived from the mount path: /home/ericxu/Downloads/Share -> home-ericxu-Downloads-Share.mount
+    after = [ "home-ericxu-Downloads-Share.mount" ];  # After mounting, run
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";

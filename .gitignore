@@ -1,3 +1,5 @@
+# Keep language/package manager lockfiles ignored, but always track flake.lock
 *.lock
+!flake.lock
 result
 .DS_Store

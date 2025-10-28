@@ -21,5 +21,21 @@
         ];
       };
     };
+
+    # Provide a formatter for `nix fmt`
+    formatter = {
+      aarch64-linux = (import nixpkgs { system = "aarch64-linux"; }).alejandra;
+      x86_64-linux = (import nixpkgs { system = "x86_64-linux"; }).alejandra;
+    };
+
+    # Simple development shells
+    devShells = {
+      aarch64-linux.default = let pkgs = import nixpkgs { system = "aarch64-linux"; }; in pkgs.mkShell {
+        packages = with pkgs; [ alejandra nixd git ];
+      };
+      x86_64-linux.default = let pkgs = import nixpkgs { system = "x86_64-linux"; }; in pkgs.mkShell {
+        packages = with pkgs; [ alejandra nixd git ];
+      };
+    };
   };
 }
