@@ -1,6 +1,4 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# configuration.nix
 
 { config, pkgs, ... }:
 
@@ -49,20 +47,20 @@
     fcitx5 = {
       waylandFrontend = true; # Better under GNOME Wayland
       addons = with pkgs; [
-        fcitx5-chinese-addons
-        fcitx5-gtk
-        libsForQt5.fcitx5-qt
-        qt6Packages.fcitx5-qt
-        fcitx5-configtool
+        fcitx5-chinese-addons # 中文输入法插件
+        fcitx5-gtk  # GTK程序支持
+        libsForQt5.fcitx5-qt # QT5程序支持
+        qt6Packages.fcitx5-qt # QT6程序支持
+        fcitx5-configtool # 配置工具
       ];
     };
   };
 
   # Environment variables (usually auto-set by the module; keep for robustness)
   environment.variables = {
-    GTK_IM_MODULE = "fcitx";
-    QT_IM_MODULE = "fcitx";
-    XMODIFIERS = "@im=fcitx";
+    GTK_IM_MODULE = "fcitx"; # GTK输入法模块
+    QT_IM_MODULE = "fcitx"; # QT输入法模块
+    XMODIFIERS = "@im=fcitx"; # X11修饰符
   };
 
   # Enable the X11 windowing system.
@@ -117,7 +115,7 @@
     ];
   };
   
-  # enbale fish
+  # Install fish
   programs.fish.enable = true;
 
   # Install firefox.
@@ -129,7 +127,6 @@
     #qemu-guest-agent
     spice-vdagent  # Visitor Tools
     virtiofsd
-    fish
     ghostty
     git
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
